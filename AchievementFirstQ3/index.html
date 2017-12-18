@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+      <meta http-equiv="Content-Type" content="text/html">
+      <title>Achievement First OA</title>
+      <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+</head>
+
+<body>
+
+      <div id="w">
+            <p>Achievement First OA</p>
+            
+            <input type="text" name="inserttext" id="inserttext" placeholder="text">
+            <a href="#" id="Search_btn">Search</a>
+            <div id="result"></div>
+      </div>
+
+<script type="text/javascript">
+    $(function(){
+          $('#Search_btn').on('click', function(e){
+
+                var querytext = $('#inserttext').val();
+                var result_url   = 'https://api.github.com/users/'+querytext;
+                var result_url_repos  = 'https://api.github.com/users/'+querytext+'/repos';
+                
+                requestJSON(result_url, function(json) {
+
+                      if(json.message == "Not Found" || querytext == ''){
+
+                            $('#result').html("<p>No result</p>");
+
+                      }else {
+
+                            var fullname = json.name;
+                            var querytext = json.login;
+                            var out_put = '<p>'+fullname+'</p><div>';
+                            var repos;
+
+                            $.getJSON(result_url_repos, function(json){
+
+                            repos = json;   
+
+                            result_reposname();                
+                            
+                            });          
+                            
+                            function result_reposname() {
+                                  if(repos.length == 0){ 
+                                    
+                                    out_put = outhout_puttml + '<p>No Repositories</p></div>'; 
+                                  
+                                  }else {
+                                    
+                                    out_put = out_put + '<p>List User Repositories :</p>';
+                                    
+                                    $.each(repos, function(num){
+                                      out_put = out_put + '<li>' + repos[num].name + '</li>';
+                                    });
+
+                                    out_put = out_put + '</ul></div>'; 
+                                  }
+
+                                  $('#result').html(out_put);
+                            } 
+                      } 
+                }); 
+          }); 
+          
+
+          function requestJSON(urls, callback){
+                $.ajax({
+
+                      url: urls,
+
+                      complete: function(xhr){
+                        
+                            callback.call(null, xhr.responseJSON);
+
+                      }
+                });
+          }
+    });
+</script>
+</body>
+</html>
